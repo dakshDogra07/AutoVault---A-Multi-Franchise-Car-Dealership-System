@@ -1,55 +1,66 @@
-sales = []
+from db import get_connection
 
 def sell_car(franchise_id):
-    from cars import cars
-    from customers import customers
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
     
-    print("\n=== Sell Car ===")
+    cursor.execute("SELECT * FROM cars WHERE franchise_id = %s AND sold = FALSE", (franchise_id,))
+    cars = cursor.fetchall()
     
-    available_cars = [c for c in cars if c["franchise_id"] == franchise_id and not c["sold"]]
-    if not available_cars:
-        print("No cars available!")
+    if not cars:
+        print("\nNo cars available!")
+        conn.close()
         return
     
-    print("\nAvailable Cars:")
-    for car in available_cars:
+    print("\n=== Available Cars ===")
+    for car in cars:
         print(f"{car['id']}. {car['brand']} {car['model']} | ₹{car['price']}")
     
     car_id = int(input("\nSelect Car ID: "))
     
-    franchise_customers = [c for c in customers if c["franchise_id"] == franchise_id]
-    if not franchise_customers:
-        print("No customers found! Add customer first.")
+    cursor.execute("SELECT * FROM customers WHERE franchise_id = %s", (franchise_id,))
+    customers = cursor.fetchall()
+    
+    if not customers:
+        print("\nNo customers found! Add customer first.")
+        conn.close()
         return
     
-    print("\nCustomers:")
-    for c in franchise_customers:
+    print("\n=== Customers ===")
+    for c in customers:
         print(f"{c['id']}. {c['name']} | {c['phone']}")
     
     customer_id = int(input("\nSelect Customer ID: "))
     
-    car = next((c for c in cars if c["id"] == car_id), None)
-    customer = next((c for c in customers if c["id"] == customer_id), None)
+    cursor.execute("SELECT price FROM cars WHERE id = %s", (car_id,))
+    car = cursor.fetchone()
     
-    if car and customer:
-        car["sold"] = True
-        sale = {
-            "id": len(sales) + 1,
-            "franchise_id": franchise_id,
-            "car": f"{car['brand']} {car['model']}",
-            "customer": customer["name"],
-            "price": car["price"]
-        }
-        sales.append(sale)
-        print(f"\n✅ {car['brand']} {car['model']} sold to {customer['name']}!")
+    cursor.execute("UPDATE cars SET sold = TRUE WHERE id = %s", (car_id,))
+    cursor.execute(
+        "INSERT INTO sales (franchise_id, car_id, customer_id, price) VALUES (%s, %s, %s, %s)",
+        (franchise_id, car_id, customer_id, car['price'])
+    )
+    conn.commit()
+    conn.close()
+    print(f"\n✅ Car sold successfully!")
 
 def view_sales(franchise_id):
-    print("\n=== Sales History ===")
-    franchise_sales = [s for s in sales if s["franchise_id"] == franchise_id]
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT s.id, c.brand, c.model, cu.name, s.price, s.sale_date 
+        FROM sales s
+        JOIN cars c ON s.car_id = c.id
+        JOIN customers cu ON s.customer_id = cu.id
+        WHERE s.franchise_id = %s
+    """, (franchise_id,))
+    sales = cursor.fetchall()
+    conn.close()
     
-    if not franchise_sales:
+    print("\n=== Sales History ===")
+    if not sales:
         print("No sales yet!")
         return
     
-    for s in franchise_sales:
-        print(f"{s['id']}. {s['car']} | {s['customer']} | ₹{s['price']}")
+    for s in sales:
+        print(f"{s['id']}. {s['brand']} {s['model']} | {s['name']} | ₹{s['price']} | {s['sale_date']}")
