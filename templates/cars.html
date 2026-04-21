@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cars - AutoVault</title>
+    <style>
+        body { font-family: Arial; background: #1a1a2e; color: white; padding: 30px; }
+        h1 { color: #e94560; text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; border: 1px solid #16213e; text-align: left; }
+        th { background: #e94560; }
+        tr:hover { background: #16213e; }
+        .form-box { background: #16213e; padding: 20px; border-radius: 10px; margin-top: 30px; }
+        input { padding: 8px; margin: 5px; border-radius: 5px; border: none; width: 180px; }
+        button { background: #e94560; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+        a { color: #e94560; }
+    </style>
+</head>
+<body>
+    <h1>🚘 Cars</h1>
+    <a href="/dashboard">← Back</a>
+
+    <table>
+        <tr>
+            <th>ID</th><th>Brand</th><th>Model</th><th>Color</th><th>Year</th><th>Price</th>
+        </tr>
+        {% for car in cars %}
+        <tr>
+            <td>{{ car.id }}</td>
+            <td>{{ car.brand }}</td>
+            <td>{{ car.model }}</td>
+            <td>{{ car.color }}</td>
+            <td>{{ car.year }}</td>
+            <td>₹{{ car.price }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <div class="form-box">
+        <h3>Add New Car</h3>
+        <form action="/add_car/{{ franchise_id }}" method="POST">
+            <input type="text" name="brand" placeholder="Brand" required>
+            <input type="text" name="model" placeholder="Model" required>
+            <input type="number" name="price" placeholder="Price" required>
+            <input type="text" name="color" placeholder="Color" required>
+            <input type="number" name="year" placeholder="Year" required>
+            <br><br>
+            <button type="submit">Add Car</button>
+        </form>
+    </div>
+</body>
+</html>

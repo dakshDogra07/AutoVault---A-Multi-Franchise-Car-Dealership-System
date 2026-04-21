@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AutoVault</title>
+    <style>
+        body { font-family: Arial; background: #1a1a2e; color: white; text-align: center; padding: 50px; }
+        h1 { color: #e94560; font-size: 3em; }
+        .franchise-card { background: #16213e; padding: 20px; margin: 10px auto; width: 300px; border-radius: 10px; cursor: pointer; }
+        .franchise-card:hover { background: #e94560; }
+        a { text-decoration: none; color: white; }
+    </style>
+</head>
+<body>
+    <h1>🚗 AutoVault</h1>
+    <h2>Select Franchise</h2>
+    {% for f in franchises %}
+    <div class="franchise-card">
+        <a href="/select/{{ f.id }}">
+            <h3>{{ f.name }}</h3>
+            <p>{{ f.city }}</p>
+        </a>
+    </div>
+    {% endfor %}
+</body>
+</html>

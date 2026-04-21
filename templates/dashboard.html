@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ franchise.name }} - AutoVault</title>
+    <style>
+        body { font-family: Arial; background: #1a1a2e; color: white; text-align: center; padding: 50px; }
+        h1 { color: #e94560; }
+        .menu { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-top: 30px; }
+        .card { background: #16213e; padding: 30px; width: 200px; border-radius: 10px; cursor: pointer; }
+        .card a { display: block; width: 100%; height: 100%; }
+        .card:hover { background: #e94560; }
+        a { text-decoration: none; color: white; }
+        .back { margin-top: 30px; color: #e94560; }
+    </style>
+</head>
+<body>
+    <h1>🚗 {{ franchise.name }}</h1>
+    <p>{{ franchise.city }}</p>
+    
+    <div class="menu">
+        <div class="card"><a href="/cars/{{ franchise.id }}">🚘<br>Cars</a></div>
+        <div class="card"><a href="/customers/{{ franchise.id }}">👥<br>Customers</a></div>
+        <div class="card"><a href="/sales/{{ franchise.id }}">💰<br>Sales</a></div>
+    </div>
+
+    <div class="back"><a href="/">← Switch Franchise</a></div>
+</body>
+</html>
