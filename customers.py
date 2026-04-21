@@ -1,4 +1,4 @@
-customers = []
+from db import get_connection
 
 def add_customer(franchise_id):
     print("\n=== Add Customer ===")
@@ -6,23 +6,27 @@ def add_customer(franchise_id):
     phone = input("Phone: ")
     email = input("Email: ")
     
-    customer = {
-        "id": len(customers) + 1,
-        "franchise_id": franchise_id,
-        "name": name,
-        "phone": phone,
-        "email": email
-    }
-    customers.append(customer)
-    print(f"\n Customer {name} added successfully!")
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO customers (franchise_id, name, phone, email) VALUES (%s, %s, %s, %s)",
+        (franchise_id, name, phone, email)
+    )
+    conn.commit()
+    conn.close()
+    print(f"\n✅ Customer {name} added successfully!")
 
 def view_customers(franchise_id):
-    print("\n=== Customers ===")
-    franchise_customers = [c for c in customers if c["franchise_id"] == franchise_id]
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM customers WHERE franchise_id = %s", (franchise_id,))
+    customers = cursor.fetchall()
+    conn.close()
     
-    if not franchise_customers:
+    print("\n=== Customers ===")
+    if not customers:
         print("No customers found!")
         return
     
-    for c in franchise_customers:
+    for c in customers:
         print(f"{c['id']}. {c['name']} | {c['phone']} | {c['email']}")
