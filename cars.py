@@ -1,4 +1,4 @@
-cars = []
+from db import get_connection
 
 def add_car(franchise_id):
     print("\n=== Add Car ===")
@@ -8,26 +8,27 @@ def add_car(franchise_id):
     color = input("Color: ")
     year = input("Year: ")
     
-    car = {
-        "id": len(cars) + 1,
-        "franchise_id": franchise_id,
-        "brand": brand,
-        "model": model,
-        "price": price,
-        "color": color,
-        "year": year,
-        "sold": False
-    }
-    cars.append(car)
-    print(f"\n {brand} {model} added successfully!")
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO cars (franchise_id, brand, model, price, color, year) VALUES (%s, %s, %s, %s, %s, %s)",
+        (franchise_id, brand, model, price, color, year)
+    )
+    conn.commit()
+    conn.close()
+    print(f"\n✅ {brand} {model} added successfully!")
 
 def view_cars(franchise_id):
-    print("\n=== Available Cars ===")
-    franchise_cars = [c for c in cars if c["franchise_id"] == franchise_id and not c["sold"]]
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM cars WHERE franchise_id = %s AND sold = FALSE", (franchise_id,))
+    cars = cursor.fetchall()
+    conn.close()
     
-    if not franchise_cars:
+    print("\n=== Available Cars ===")
+    if not cars:
         print("No cars available!")
         return
     
-    for car in franchise_cars:
+    for car in cars:
         print(f"{car['id']}. {car['brand']} {car['model']} | {car['color']} | {car['year']} | ₹{car['price']}")
